@@ -42,11 +42,17 @@ class PhotoFrame extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       )
-                    : Image.file(
-                        File(photoPath!),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
+                    : photoPath!.startsWith('http')
+                        ? Image.network(
+                            photoPath!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          )
+                        : Image.file(
+                            File(photoPath!),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
               ),
             ),
             Container(

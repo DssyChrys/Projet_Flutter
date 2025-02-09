@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'photo_frame.dart'; 
+import 'photo_frame.dart';
+import 'image_data.dart';
+import 'dart:math' as math;
 
 void main() {
   runApp(const MyApp());
@@ -30,16 +32,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String?> _photos = List.filled(10, null);
+  final List<String?> _photos = [];
   final ImagePicker _picker = ImagePicker();
 
   void _addPhotoFrame() {
     setState(() {
-      // Trouve le premier emplacement vide
-      int index = _photos.indexOf(null);
-      if (index == -1) {
-        _photos.add(null);
-      }
+      _photos.add(ImageData.getRandomImage());
     });
   }
 
