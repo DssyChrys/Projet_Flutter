@@ -35,6 +35,19 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<String?> _photos = [];
   final ImagePicker _picker = ImagePicker();
 
+  @override
+  void initState() {
+    super.initState();
+    _initPhotos(); // Charge 16 images au démarrage
+  }
+
+  // Fonction pour pré-remplir la galerie avec 16 images
+  void _initPhotos() {
+    setState(() {
+      _photos.addAll(List.generate(12, (_) => ImageData.getRandomImage()));
+    });
+  }
+
   void _addPhotoFrame() {
     setState(() {
       _photos.add(ImageData.getRandomImage());
