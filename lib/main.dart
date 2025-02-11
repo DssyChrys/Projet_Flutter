@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'photo_frame.dart';
 import 'image_data.dart';
-import 'dart:math' as math;
 
 void main() {
   runApp(const MyApp());
@@ -37,14 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<int> _likes = [];
   final List<List<String>> _comments = [];
   final List<TextEditingController> _commentControllers = [];
-
+  
   @override
   void initState() {
     super.initState();
-    _initPhotos(); // Charge 16 images au démarrage
+    _initPhotos();
   }
 
-  // Fonction pour pré-remplir la galerie avec 16 images
   void _initPhotos() {
     setState(() {
       _photos.addAll(List.generate(12, (_) => ImageData.getRandomImage()));
@@ -63,20 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
-  //Fonction pour gérer les likes;
   void _likePhoto(int index) {
     setState(() {
       _likes[index]++;
     });
   }
 
-
-  //Fonction pour gérer les commentaires;
-  void _addComment(int index, String comment) {
-    if (comment.trim().isNotEmpty) {
+  void _addComment(int index) {
+    String comment = _commentControllers[index].text.trim();
+    if (comment.isNotEmpty) {
       setState(() {
-        _comments[index].add(comment.trim());
+        _comments[index].add(comment);
+        _commentControllers[index].clear();
       });
     }
   }
@@ -112,10 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         itemCount: _photos.length,
         itemBuilder: (context, index) {
-          return PhotoFrame(
-            photoPath: _photos[index],
-            onTap: () => _selectPhoto(index),
-          );
           return Column(
             children: [
               Expanded(
@@ -128,42 +120,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.favorite, color: Colors.red),
+                    icon: const Icon(Icons.favorite, color: Colors.red),
                     onPressed: () => _likePhoto(index),
                   ),
-                  Text("${_likes[index]} likes"),
+                  Text('${_likes[index]} Likes'),
                 ],
               ),
-              TextField(
-                controller: _commentControllers[index],
-                decoration: InputDecoration(
-                  hintText: "Ajouter un commentaire...",
-                  border: OutlineInputBorder(),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _commentControllers[index],
+                      decoration: const InputDecoration(
+                        hintText: 'Ajouter un commentaire...',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () => _addComment(index),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _comments[index].length,
+                  itemBuilder: (context, commentIndex) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text(_comments[index][commentIndex]),
+                    );
+                  },
                 ),
-                onSubmitted: (text){
-                  _addComment(index, text);
-                  _commentControllers[index].clear();
-                }
-
-              ),
-              Expanded( //  pour afficher les commentaires
-              child: ListView.builder(
-                shrinkWrap: true, // Permet d'éviter un problème de hauteur infinie
-                physics: NeverScrollableScrollPhysics(), // Désactive le scroll interne
-                itemCount: _comments[index].length,
-                itemBuilder: (context, commentIndex) {
-                return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                _comments[index][commentIndex],
-                style: TextStyle(fontSize: 14, color: Colors.black87),
-                ),
-                );
-                },
-              ),
-              ),
-              Column(
-                children: _comments[index].map((comment) => Text(comment)).toList(),
               ),
             ],
           );
