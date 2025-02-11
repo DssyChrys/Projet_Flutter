@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'photo_frame.dart';
 import 'image_data.dart';
-import 'dart:math' as math;
 
 void main() {
   runApp(const MyApp());
@@ -34,24 +33,48 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<String?> _photos = [];
   final ImagePicker _picker = ImagePicker();
-
+  final List<int> _likes = [];
+  final List<List<String>> _comments = [];
+  final List<TextEditingController> _commentControllers = [];
+  
   @override
   void initState() {
     super.initState();
-    _initPhotos(); // Charge 16 images au démarrage
+    _initPhotos();
   }
 
-  // Fonction pour pré-remplir la galerie avec 16 images
   void _initPhotos() {
     setState(() {
       _photos.addAll(List.generate(12, (_) => ImageData.getRandomImage()));
+      _likes.addAll(List.generate(12, (_) => 0));
+      _comments.addAll(List.generate(12, (_) => []));
+      _commentControllers.addAll(List.generate(12, (_) => TextEditingController()));
     });
   }
 
   void _addPhotoFrame() {
     setState(() {
       _photos.add(ImageData.getRandomImage());
+      _likes.add(0);
+      _comments.add([]);
+      _commentControllers.add(TextEditingController());
     });
+  }
+
+  void _likePhoto(int index) {
+    setState(() {
+      _likes[index]++;
+    });
+  }
+
+  void _addComment(int index) {
+    String comment = _commentControllers[index].text.trim();
+    if (comment.isNotEmpty) {
+      setState(() {
+        _comments[index].add(comment);
+        _commentControllers[index].clear();
+      });
+    }
   }
 
   Future<void> _selectPhoto(int index) async {
@@ -85,9 +108,54 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         itemCount: _photos.length,
         itemBuilder: (context, index) {
-          return PhotoFrame(
-            photoPath: _photos[index],
-            onTap: () => _selectPhoto(index),
+          return Column(
+            children: [
+              Expanded(
+                child: PhotoFrame(
+                  photoPath: _photos[index],
+                  onTap: () => _selectPhoto(index),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.red),
+                    onPressed: () => _likePhoto(index),
+                  ),
+                  Text('${_likes[index]} Likes'),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _commentControllers[index],
+                      decoration: const InputDecoration(
+                        hintText: 'Ajouter un commentaire...',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () => _addComment(index),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _comments[index].length,
+                  itemBuilder: (context, commentIndex) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text(_comments[index][commentIndex]),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
