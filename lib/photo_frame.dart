@@ -3,12 +3,18 @@ import 'dart:io';
 
 class PhotoFrame extends StatelessWidget {
   final String? photoPath;
+  final int likes;
+  final VoidCallback onLike;
   final VoidCallback onTap;
+  final VoidCallback onToggleComment; // Ajout du paramètre pour afficher/masquer le champ de commentaire
 
   const PhotoFrame({
     super.key,
     required this.photoPath,
+    required this.likes,
+    required this.onLike,
     required this.onTap,
+    required this.onToggleComment, // Ajout du paramètre dans le constructeur
   });
 
   @override
@@ -35,24 +41,24 @@ class PhotoFrame extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: photoPath == null
                     ? Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.add_photo_alternate,
-                          size: 50,
-                          color: Colors.grey,
-                        ),
-                      )
+                  color: Colors.grey[200],
+                  child: const Icon(
+                    Icons.add_photo_alternate,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                )
                     : photoPath!.startsWith('http')
-                        ? Image.network(
-                            photoPath!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          )
-                        : Image.file(
-                            File(photoPath!),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
+                    ? Image.network(
+                  photoPath!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                )
+                    : Image.file(
+                  File(photoPath!),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
             Container(
@@ -65,13 +71,16 @@ class PhotoFrame extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {},
+                    icon: Icon(
+                      likes > 0 ? Icons.favorite : Icons.favorite_border,
+                      color: likes > 0 ? Colors.red : Colors.black,
+                    ),
+                    onPressed: onLike, // Appelle la fonction de HomeScreen
                     iconSize: 20,
                   ),
                   IconButton(
                     icon: const Icon(Icons.comment_outlined),
-                    onPressed: () {},
+                    onPressed: onToggleComment, // Appelle la fonction pour afficher/masquer le champ de commentaire
                     iconSize: 20,
                   ),
                   IconButton(

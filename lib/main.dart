@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Désactive le badge DEBUG
       title: 'Photo Gallery',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<int> _likes = [];
   final List<List<String>> _comments = [];
   final List<TextEditingController> _commentControllers = [];
-  
+  final List<bool> _showCommentField = []; // Ajout pour gérer l'affichage du champ de commentaire
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _likes.addAll(List.generate(12, (_) => 0));
       _comments.addAll(List.generate(12, (_) => []));
       _commentControllers.addAll(List.generate(12, (_) => TextEditingController()));
+      _showCommentField.addAll(List.generate(12, (_) => false)); // Initialisation des états d'affichage
     });
   }
 
@@ -58,12 +61,19 @@ class _HomeScreenState extends State<HomeScreen> {
       _likes.add(0);
       _comments.add([]);
       _commentControllers.add(TextEditingController());
+      _showCommentField.add(false); // Ajout du nouvel élément dans l'état d'affichage
     });
   }
 
-  void _likePhoto(int index) {
+  void _toggleLike(int index) {
     setState(() {
-      _likes[index]++;
+      _likes[index] = _likes[index] > 0 ? 0 : 1; // Toggle like/unlike
+    });
+  }
+
+  void _toggleCommentField(int index) {
+    setState(() {
+      _showCommentField[index] = !_showCommentField[index]; // Toggle visibility du champ de commentaire
     });
   }
 
@@ -102,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.8,
+          childAspectRatio: 0.75, // Ajustement pour éviter l'allongement des éléments
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
         ),
@@ -110,51 +120,63 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           return Column(
             children: [
+              // Photo + Bouton Like
               Expanded(
                 child: PhotoFrame(
                   photoPath: _photos[index],
+                  likes: _likes[index],
+                  onLike: () => _toggleLike(index),
                   onTap: () => _selectPhoto(index),
+                  onToggleComment: () => _toggleCommentField(index), // Passer la fonction
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.favorite, color: Colors.red),
-                    onPressed: () => _likePhoto(index),
-                  ),
-                  Text('${_likes[index]} Likes'),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _commentControllers[index],
-                      decoration: const InputDecoration(
-                        hintText: 'Ajouter un commentaire...',
+
+              // Champ de saisie de commentaire (affiché si _showCommentField est vrai)
+              if (_showCommentField[index])
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _commentControllers[index],
+                          decoration: const InputDecoration(
+                            hintText: 'Ajouter un commentaire...',
+                            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            border: OutlineInputBorder(),
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
-                    ),
+                      IconButton(
+                        icon: const Icon(Icons.send, size: 20),
+                        onPressed: () => _addComment(index),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () => _addComment(index),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _comments[index].length,
-                  itemBuilder: (context, commentIndex) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Text(_comments[index][commentIndex]),
-                    );
-                  },
                 ),
-              ),
+
+              // Liste des commentaires (limite de taille)
+              if (_comments[index].isNotEmpty)
+                SizedBox(
+                  height: 50, // Limite de hauteur pour éviter que la liste grandisse trop
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: _comments[index].length,
+                    itemBuilder: (context, commentIndex) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 5),
+                        child: Text(
+                          _comments[index][commentIndex],
+                          maxLines: 1, // Empêche les commentaires longs d'étirer l'élément
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },
