@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'photo_frame.dart';
 import 'image_data.dart';
+import 'gallerie.dart';  // Assure-toi que tu as importé ce fichier pour la navigation vers la galerie
 
 void main() {
   runApp(const MyApp());
@@ -96,6 +97,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Navigation vers l'écran de la galerie
+  void _navigateToGallery() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => GalleryScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: _addPhotoFrame,
+          ),
+          IconButton(
+            icon: const Icon(Icons.photo_album),
+            onPressed: _navigateToGallery, // Bouton pour accéder à la galerie
           ),
         ],
       ),
