@@ -1,5 +1,5 @@
 # projet_flutter
-- DOSSOU YOVO-CHRYS
+- DOSSOU-YOVO Chrys
 - BELLO Farhan
 - INOUSSA Hilal
 - KOSSOU Kenneth
