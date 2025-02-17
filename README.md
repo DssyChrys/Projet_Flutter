@@ -1,16 +1,8 @@
 # projet_flutter
+- DOSSOU YOVO-CHRYS
+- BELLO Farhan
+- INOUSSA Hilal
+- KOSSOU Kenneth
+- SASSE Elisé
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- NB: Bonjour Monsieur, Hilal a rencontré un problème avec sa branche, faute de temps il m'a envoyé le code de sa partie que j'ai push sur ma branche. Il est  chargé de tout ce que le bouton télécharger permet à l'utilisateur de faire.Je voulais vous le notifier.Merci à vous Monsieur
