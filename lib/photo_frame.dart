@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 
 class PhotoFrame extends StatelessWidget {
@@ -19,6 +20,10 @@ class PhotoFrame extends StatelessWidget {
     required this.onTap,
     required this.onToggleComment,
   });
+
+  Future<void> _shareImage(String imagePath) async {
+    Share.shareFiles([imagePath], text: 'Check out this image!');
+  }
 
   Future<void> _downloadImage(BuildContext context) async {
     if (photoPath == null || !photoPath!.startsWith('http')) {
@@ -88,22 +93,27 @@ class PhotoFrame extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: photoPath == null
                     ? Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.add_photo_alternate, size: 50, color: Colors.grey),
-                )
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.add_photo_alternate,
+                            size: 50, color: Colors.grey),
+                      )
                     : photoPath!.startsWith('http')
-                    ? Image.network(photoPath!, fit: BoxFit.cover, width: double.infinity)
-                    : Image.file(File(photoPath!), fit: BoxFit.cover, width: double.infinity),
+                        ? Image.network(photoPath!,
+                            fit: BoxFit.cover, width: double.infinity)
+                        : Image.file(File(photoPath!),
+                            fit: BoxFit.cover, width: double.infinity),
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(12)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -123,7 +133,8 @@ class PhotoFrame extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.share),
-                    onPressed: () {},
+                    onPressed: () => _shareImage(
+                        photoPath!), // Appel de la fonction pour partager
                     iconSize: 20,
                   ),
                   IconButton(
